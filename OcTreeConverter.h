@@ -2,14 +2,14 @@
 
 #include <rsb/converter/Converter.h>
 
-namespace converter_tutorial {
+namespace converter_OcTree {
 
 /**
- * A simple converter for the SimpleImage struct. For educational use only.
+ * A simple converter for the OcTree object.
  */
-class SimpleImageConverter: public rsb::converter::Converter<std::string> {
+class OcTreeConverter: public rsb::converter::Converter<std::string> {
 public:
-    SimpleImageConverter();
+    OcTreeConverter();
 
     std::string serialize(const rsb::AnnotatedData& data,
             std::string& wire);
