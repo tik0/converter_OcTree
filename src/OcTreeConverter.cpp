@@ -1,74 +1,84 @@
-#include "SimpleImageConverter.h"
+#include "OcTreeConverter.h"
 
-#include "SimpleImage.h"
-
-using namespace std;
-
-using namespace boost;
-
-using namespace rsb;
-using namespace rsb::converter;
-
-namespace converter_tutorial {
+namespace converter_OcTree {
 
 // We have to pass two arguments to the base-class constructor:
 // 1. The data-type
 // 2. The wire-schema
 //
 // Note: this could also be written as
-// Converter<string>("simple-image", RSB_TYPE_TAG(SimpleImage))
+// Converter<string>("octal-tree", RSB_TYPE_TAG(OcTree))
 // to infer the "string" name of the data-type using RTTI.
-SimpleImageConverter::SimpleImageConverter() :
-    Converter<string> ("converter_tutorial::SimpleImage", "simple-image", true) {
+OcTreeConverter::OcTreeConverter() :
+    Converter<string> ("octomap::OcTree", "octal-tree", true) {
 }
 
-string SimpleImageConverter::serialize(const AnnotatedData& data, string& wire) {
+string OcTreeConverter::serialize(const AnnotatedData& data, string& wire) {
     // Ensure that DATA actually holds a datum of the data-type we
     // expect.
-    assert(data.first == getDataType()); // this->getDataType() == "converter_tutorial::SimpleImage"
+    assert(data.first == getDataType()); // this->getDataType() == "converter_OcTree::OcTree"
 
     // Force conversion to the expected data-type.
     //
     // NOTE: a dynamic_pointer_cast cannot be used from void*
-    boost::shared_ptr<const SimpleImage> image =
-            static_pointer_cast<const SimpleImage> (data.second);
+    boost::shared_ptr<const OcTree> tree =
+            static_pointer_cast<const OcTree> (data.second);
 
-    // Store the content of IMAGE in WIRE according to the selected
-    // binary layout.
+    // Prepare the sending data
     //
-    // NOTE: do not use this kind of "serialization" for any real code.
-    int numPixels = image->width * image->height;
-    wire.resize(4 + 4 + numPixels);
-    copy((char*) &image->width, ((char*) &image->width) + 4, wire.begin());
-    copy((char*) &image->height, ((char*) &image->height) + 4, wire.begin() + 4);
-    copy((char*) image->data, ((char*) image->data) + numPixels,
-            wire.begin() + 8);
+    // Get the binary data of the octree and write it to a char array
+    std::ostringstream stream;             				// Define a outputstream
+    tree->writeBinaryData(stream);						// Write binary data to outputstream
+    std::string   str = stream.str();					// Copy the stream to a string
+    const char*   chr = str.c_str();					// Copy the string to a char
+    // Get the resolution of the leafs
+    const  double leaf_res = tree->getResolution();     // Get the resolution
+    // Get the amount of leafs
+    const  uint   str_size = str.size();				// Get the amount of binary data
+
+
+    // Store the content of TREE in WIRE according to the selected
+	// binary layout.
+	// Define the amount of sending data
+    // Allocate amount of leafs (int -> 4), the resolution (double -> 8) and the data (char[] -> str.size())
+    wire.resize( 4 + 8 + str.size() );
+    // Write the amount of leafs
+    copy(((char*) &str_size), ((char*) &str_size) + 4, wire.begin());
+    // Write the resolution of leafs
+    copy(((char*) &leaf_res), ((char*) &leaf_res) + 8, wire.begin() + 4);
+    // Write the data
+    copy(chr, chr + str.size(), wire.begin() + 12 );
 
     // Return the wire-schema of the serialized representation in
     // WIRE.
-    return getWireSchema(); // this->getWireSchema() == "simple-image"
+    return getWireSchema(); // this->getWireSchema() == "octal-tree"
 }
 
-AnnotatedData SimpleImageConverter::deserialize(const string& wireSchema,
+AnnotatedData OcTreeConverter::deserialize(const string& wireSchema,
         const string& wire) {
     // Ensure that WIRE uses the expected wire-schema.
-    assert(wireSchema == getWireSchema()); // this->getWireSchema() == "simple-image"
+    assert(wireSchema == getWireSchema()); // this->getWireSchema() == "octal-tree"
 
     // Allocate a new SimpleImage object and set its data members from
     // the content of WIRE.
     //
-    // NOTE: do not use this kind of "deserialization" for any real
-    // code.
-    SimpleImage* image = new SimpleImage();
-    image->width = *((int*) &*wire.begin());
-    image->height = *((int*) &*(wire.begin() + 4));
-    image->data = new unsigned char[image->width * image->height];
-    copy(wire.begin() + 8, wire.begin() + 8 + image->width * image->height,
-            image->data);
+
+    // Get the amount of leafs
+    const uint   str_size = *((uint*)   &*wire.begin());
+    // Get the resolution
+    const double leaf_res = *((double*) &*(wire.begin() + 4));
+
+
+    // store the binary data to a stream
+    std::istringstream stream(std::string(&*(wire.begin() + 12), str_size));
+
+    // Save the stream to the octree
+    OcTree * tree = new OcTree(leaf_res);
+    tree->readBinaryData(stream);
 
     // Return (a shared_ptr to) the constructed object along with its
     // data-type.
-    return make_pair(getDataType(), boost::shared_ptr<SimpleImage> (image));
+    return make_pair(getDataType(), boost::shared_ptr<OcTree> (tree));
 }
 
 }

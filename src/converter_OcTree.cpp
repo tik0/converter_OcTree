@@ -1,74 +1,133 @@
-#include "SimpleImageConverter.h"
-
-#include "SimpleImage.h"
-
-using namespace std;
+#include <boost/shared_ptr.hpp>
+#include <rsb/Factory.h>
+#include <rsb/converter/Repository.h>
+#include <rsb/Event.h>
+#include <rsb/Handler.h>
+#include <rsb/filter/OriginFilter.h>
+#include <octomap/octomap.h>
+#include <octomap/OcTree.h>
+#include "OcTreeConverter.h"            // This is the converter
+#include <string>
 
 using namespace boost;
-
+using namespace std;
+using namespace octomap;
 using namespace rsb;
 using namespace rsb::converter;
+using namespace converter_OcTree;
 
-namespace converter_tutorial {
+// Filling the octree with some data
+void createTree(OcTree * tree);
 
-// We have to pass two arguments to the base-class constructor:
-// 1. The data-type
-// 2. The wire-schema
+// Print out the recieved octree
+void getMessage(rsb::EventPtr event);
+
+//// Simple sending of an octree
+//int main() {
+//    // Register our converter within the collection of converters for
+//    // the string wire-type (which is used for arrays of octets in
+//    // C++).
+//    shared_ptr<OcTreeConverter> converter(new OcTreeConverter());
+//    converterRepository<std::string>()->registerConverter(converter);
 //
-// Note: this could also be written as
-// Converter<string>("simple-image", RSB_TYPE_TAG(SimpleImage))
-// to infer the "string" name of the data-type using RTTI.
-SimpleImageConverter::SimpleImageConverter() :
-    Converter<string> ("converter_tutorial::SimpleImage", "simple-image", true) {
+//    // Create an Informer object that is parametrized with the
+//    // data-type SimpleImage.
+//
+//    Informer<OcTree>::Ptr informer =
+//            getFactory().createInformer<OcTree> (
+//                    Scope("/octree"));
+//
+//    // Construct and send a OcTree object.
+//    shared_ptr<OcTree> tree(new OcTree(0.1));
+//    informer->publish(tree);
+//
+//    return EXIT_SUCCESS;
+//}
+
+
+// Sending and receiving of an octree
+int main(int argc, char *argv[]) {
+
+    // Register our converter within the collection of converters for
+    // the string wire-type (which is used for arrays of octets in
+    // C++).
+    shared_ptr<OcTreeConverter> converter(new OcTreeConverter());
+    converterRepository<std::string>()->registerConverter(converter);
+
+
+    rsb::Factory &factory = rsb::Factory::getInstance();
+
+
+    // Create the informer
+    Informer<OcTree>::Ptr informer =
+            getFactory().createInformer<OcTree> (Scope("/pointcloud"));
+
+    // Create and start the listener
+    rsb::ListenerPtr listener = factory.createListener("/pointcloud");
+    listener->addHandler(rsb::HandlerPtr(new rsb::EventFunctionHandler(&getMessage)));
+
+
+    // Create an octree with 0.1 resolution and fill it with some data
+    shared_ptr<OcTree> message(new OcTree(0.1));
+    createTree( &(*message) );
+
+
+    // Hit enter to send an octree
+    while (true) {
+    	// Keyboard input
+        cout << "Hit enter for sending an octree or ^C for exit" << endl;
+        cout.flush();
+        string keyboard;
+        getline(cin, keyboard); // This blocks until enter was hit
+
+        cout << "Write send message to 'input.bt'" << endl;
+        message->writeBinary("input.bt");
+
+        // Publish the data
+        informer->publish(message);
+    }
+
+    return EXIT_SUCCESS;
 }
 
-string SimpleImageConverter::serialize(const AnnotatedData& data, string& wire) {
-    // Ensure that DATA actually holds a datum of the data-type we
-    // expect.
-    assert(data.first == getDataType()); // this->getDataType() == "converter_tutorial::SimpleImage"
 
-    // Force conversion to the expected data-type.
-    //
-    // NOTE: a dynamic_pointer_cast cannot be used from void*
-    boost::shared_ptr<const SimpleImage> image =
-            static_pointer_cast<const SimpleImage> (data.second);
 
-    // Store the content of IMAGE in WIRE according to the selected
-    // binary layout.
-    //
-    // NOTE: do not use this kind of "serialization" for any real code.
-    int numPixels = image->width * image->height;
-    wire.resize(4 + 4 + numPixels);
-    copy((char*) &image->width, ((char*) &image->width) + 4, wire.begin());
-    copy((char*) &image->height, ((char*) &image->height) + 4, wire.begin() + 4);
-    copy((char*) image->data, ((char*) image->data) + numPixels,
-            wire.begin() + 8);
+void createTree(OcTree * tree) {
+	  cout << "generating example map" << endl;
 
-    // Return the wire-schema of the serialized representation in
-    // WIRE.
-    return getWireSchema(); // this->getWireSchema() == "simple-image"
+	  // insert some measurements of occupied cells
+
+	  for (int x=-20; x<20; x++) {
+	    for (int y=-20; y<20; y++) {
+	      for (int z=-20; z<20; z++) {
+	        point3d endpoint ((float) x*0.05f, (float) y*0.05f, (float) z*0.05f);
+	        tree->updateNode(endpoint, true); // integrate 'occupied' measurement
+	      }
+	    }
+	  }
+
+	  // insert some measurements of free cells
+
+	  for (int x=-30; x<30; x++) {
+	    for (int y=-30; y<30; y++) {
+	      for (int z=-30; z<30; z++) {
+	        point3d endpoint ((float) x*0.02f-1.0f, (float) y*0.02f-1.0f, (float) z*0.02f-1.0f);
+	        tree->updateNode(endpoint, false);  // integrate 'free' measurement
+	      }
+	    }
+	  }
 }
 
-AnnotatedData SimpleImageConverter::deserialize(const string& wireSchema,
-        const string& wire) {
-    // Ensure that WIRE uses the expected wire-schema.
-    assert(wireSchema == getWireSchema()); // this->getWireSchema() == "simple-image"
+void getMessage(rsb::EventPtr event) {
 
-    // Allocate a new SimpleImage object and set its data members from
-    // the content of WIRE.
-    //
-    // NOTE: do not use this kind of "deserialization" for any real
-    // code.
-    SimpleImage* image = new SimpleImage();
-    image->width = *((int*) &*wire.begin());
-    image->height = *((int*) &*(wire.begin() + 4));
-    image->data = new unsigned char[image->width * image->height];
-    copy(wire.begin() + 8, wire.begin() + 8 + image->width * image->height,
-            image->data);
+	// Get the data
+    shared_ptr<OcTree> message_rec = static_pointer_cast<OcTree>(event->getData());
 
-    // Return (a shared_ptr to) the constructed object along with its
-    // data-type.
-    return make_pair(getDataType(), boost::shared_ptr<SimpleImage> (image));
+    // Write OcTree to file
+    message_rec->writeBinary("output.bt");
+
+    // Some output
+	cout << endl << "Write recieved date to 'output.bt'" << endl;
+    cout.flush();
 }
 
-}
