@@ -25,7 +25,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.139690762" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.631400145" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1127452771" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.paths.554042422" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.cpp.compiler.option.include.paths.554042422" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/include/rsb0.9"/>
 									<listOptionValue builtIn="false" value="/usr/include/rsc0.9"/>
 								</option>
@@ -38,9 +38,19 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1270314051" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.980649590" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
-								<option id="gnu.cpp.link.option.paths.297688480" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+								<option id="gnu.cpp.link.option.paths.297688480" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/usr/lib"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib/"/>
+								</option>
+								<option id="gnu.cpp.link.option.libs.1436036487" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":librsc0.9.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":librsbts.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":librsbsimplebuffer.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":librsb.so.0.9"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":libboost_system.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":liboctomath.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":liboctovis.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":liboctomap.so"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.656439266" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -81,7 +91,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1471622390" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release">
 								<option id="gnu.cpp.compiler.exe.release.option.optimization.level.1321132103" name="Optimization Level" superClass="gnu.cpp.compiler.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.release.option.debugging.level.16030489" name="Debug Level" superClass="gnu.cpp.compiler.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.paths.1471519307" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.cpp.compiler.option.include.paths.1471519307" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/include/rsb0.9"/>
 									<listOptionValue builtIn="false" value="/usr/include/rsc0.9"/>
 								</option>
@@ -94,9 +104,19 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.775157781" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.310007425" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
-								<option id="gnu.cpp.link.option.paths.1587351199" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+								<option id="gnu.cpp.link.option.paths.1587351199" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/usr/lib"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib/"/>
+								</option>
+								<option id="gnu.cpp.link.option.libs.1071631342" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":librsc0.9.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":librsbts.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":librsbsimplebuffer.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":librsb.so.0.9"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":libboost_system.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":liboctomath.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":liboctovis.so"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value=":liboctomap.so"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.480810760" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
