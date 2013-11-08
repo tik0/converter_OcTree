@@ -7,11 +7,10 @@ The sendmessage will be written to 'input.bt' and the receivemessage to 'output.
 For compairsion use 'octovis' or 'diff'.
 
 
-Some helpfull links which helped me:
+Some helpfull links which helped me
+-----------------------------------
 
-Convert ostream into standart string for serialization of the OcTree->string:
-
-http://stackoverflow.com/questions/3513173/converting-ostream-into-standard-string
+* [Convert ostream into standart string for serialization of the OcTree->string](http://stackoverflow.com/questions/3513173/converting-ostream-into-standard-string)
 
 Get an istream from a char* for deserialization of the string->OcTree:
 
