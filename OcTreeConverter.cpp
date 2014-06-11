@@ -1,6 +1,6 @@
-#include "SimpleImageConverter.h"
+#include "OcTreeConverter.h"
 
-#include "SimpleImage.h"
+#include <OcTree> // TODO
 
 using namespace std;
 
@@ -9,7 +9,7 @@ using namespace boost;
 using namespace rsb;
 using namespace rsb::converter;
 
-namespace converter_tutorial {
+namespace converter_OcTree {
 
 // We have to pass two arguments to the base-class constructor:
 // 1. The data-type
